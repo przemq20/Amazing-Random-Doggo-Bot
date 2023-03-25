@@ -30,15 +30,17 @@ class RandomDoggoBot(val token: String) extends TelegramBot with Polling with Co
             sendPhoto(msg.source)
           }
       _ <- Future {
-            scribe.info(s"Updating counter for ${msg.chat.firstName} ${msg.chat.lastName}")
+            val firstName = msg.chat.firstName.getOrElse("")
+            val lastName  = msg.chat.lastName.getOrElse("")
+            scribe.info(s"Updating counter for $firstName $lastName")
             if (chat.id != adminChat)
               sendMessage(
                 adminChat,
-                s"${chat.firstName.getOrElse("")} ${chat.lastName.getOrElse("")} downloaded a photo",
+                s"$firstName $lastName downloaded a photo",
                 disableNotification = Some(true)
               )
             pc.personTable
-              .insert(chat.id, chat.firstName.getOrElse(""), chat.lastName.getOrElse(""), chat.username.getOrElse(""))
+              .insert(chat.id, firstName, lastName, chat.username.getOrElse(""))
           }
     } yield ()
 
@@ -60,10 +62,10 @@ class RandomDoggoBot(val token: String) extends TelegramBot with Polling with Co
     }
   }
 
-  def sendPhoto(chatId: Long): Future[Message] = {
+  def sendPhoto(chatId: Long, caption: Option[String] = None): Future[Message] = {
     val bytes = api.downloadPhoto(1 * 1024 * 1024)
     val photo = InputFile("pjesek.png", bytes)
-    request(SendPhoto(chatId, photo))
+    request(SendPhoto(chatId, photo, caption))
   }
 
   def sendMessage(chatId: Long, message: String, disableNotification: Option[Boolean] = None): Future[Message] =

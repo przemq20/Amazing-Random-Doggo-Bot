@@ -31,7 +31,7 @@ class DailyDoggo(randomDoggoBot: RandomDoggoBot) {
   def sendDailyDoggo(): Flow[Tick, Tick, NotUsed] = Flow[Tick].map { tick =>
     val chatIds = pc.personTable.getPeople.filter(_.subscription).map(_.chatId)
     for (chatId <- chatIds)
-      randomDoggoBot.sendPhoto(chatId)
+      randomDoggoBot.sendPhoto(chatId, Some("Your daily doggo!"))
     tick
   }
 
