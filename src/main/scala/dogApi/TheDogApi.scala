@@ -1,17 +1,17 @@
 package dogApi
 
+import dogApi.TheDogApi.{ TOKEN, URL }
 import scalaj.http.Http
 import spray.json.DefaultJsonProtocol.StringJsonFormat
 import spray.json._
+import utils.{ConfigType, Environment}
 
 class TheDogApi extends PhotoApi {
-  private val token = ConfigGetter.theDogApiToken
-  private val url   = ConfigGetter.theDogApiUrl
 
   override def getPhotoUrl: String = {
 
-    val request = Http(url)
-      .header("X-Auth-Token", token)
+    val request = Http(URL)
+      .header("X-Auth-Token", TOKEN)
       .header("Content-type", "application/json")
       .header("Charset", "UTF-8")
 
@@ -26,4 +26,8 @@ class TheDogApi extends PhotoApi {
     }
     result
   }
+}
+object TheDogApi extends Environment("TheDogApi", ConfigType.BOTH) {
+  private val TOKEN = config.getVariableString("credentials.token")
+  private val URL   = config.getVariableString("environment.url")
 }

@@ -3,6 +3,7 @@ package dogApi
 import scalaj.http.Http
 import spray.json.DefaultJsonProtocol.StringJsonFormat
 import spray.json._
+import utils.{ConfigType, Environment}
 
 class RandomWoof extends PhotoApi {
   private val url = "https://random.dog/woof.json"
@@ -23,4 +24,8 @@ class RandomWoof extends PhotoApi {
     }
     result
   }
+}
+
+object RandomWoof extends Environment("RandomWoof", ConfigType.ENVIRONMENT){
+  private lazy val URL = config.getVariableString("url")
 }

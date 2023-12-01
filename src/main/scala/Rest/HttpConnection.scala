@@ -10,6 +10,7 @@ import scala.concurrent.Future
 object HttpConnection {
   def createConnection: Future[Http.ServerBinding] = {
     val route = get {
+      scribe.info("Received GET request")
       complete(
         HttpEntity(
           ContentTypes.`text/html(UTF-8)`, {

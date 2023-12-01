@@ -1,20 +1,20 @@
 package dogApi
 
+import dogApi.DogCeo.{ BREEDS, ENDPOINT, URL }
 import scalaj.http.Http
 import spray.json.DefaultJsonProtocol.StringJsonFormat
 import spray.json._
-
+import utils.{ ConfigType, Environment }
 import scala.util.Random
 
 class DogCeo extends PhotoApi {
-  private val url:      String       = ConfigGetter.dogCeoCoreUrl
-  private val endpoint: String       = ConfigGetter.dogCeoEndpoint
-  private val breeds:   List[String] = ConfigGetter.dogCeoBreeds
-  private val random:   Random       = new Random()
+  private val random: Random = new Random()
 
   override def getPhotoUrl: String = {
-    val randomBreed = breeds(random.nextInt(breeds.size))
-    val fullUrl     = s"${url}${randomBreed}${endpoint}"
+    println(BREEDS)
+    val randomBreed: String = BREEDS(random.nextInt(BREEDS.size))
+//    println(randomBreed)
+    val fullUrl = s"${URL}${randomBreed}${ENDPOINT}"
     val request = Http(fullUrl)
       .header("Content-type", "application/json")
       .header("Charset", "UTF-8")
@@ -30,5 +30,10 @@ class DogCeo extends PhotoApi {
     }
     result
   }
+}
 
+object DogCeo extends Environment("DogCeo", ConfigType.ENVIRONMENT) {
+  private lazy val URL:      String       = config.getVariableString("url")
+  private lazy val ENDPOINT: String       = config.getVariableString("randomImage")
+  private lazy val BREEDS:   List[String] = config.getVariableList("breeds")
 }

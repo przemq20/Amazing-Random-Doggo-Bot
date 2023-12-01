@@ -1,22 +1,29 @@
 import Rest.HttpConnection.createConnection
-import telegram.DailyDoggo.DailyDoggo
-import telegram.{ Credentials, RandomDoggoBot }
+import communicators.rocketChat.{ RocketChatDoggoBot, RocketHourlyDoggo }
+import communicators.telegram.{ TelegramDailyDoggo, TelegramDoggoBot }
+import communicators.zulip.{ ZulipDoggoBot, ZulipHourlyDoggo }
 
 object Main extends App {
-  val TOKEN = Credentials.token
-  val bot   = new RandomDoggoBot(TOKEN)
+  val telegramBot = new TelegramDoggoBot
+  val zulipBot    = ZulipDoggoBot()
+  val rocketBot   = new RocketChatDoggoBot
 
   new Thread {
-    override def run(): Unit = bot.run()
+    new TelegramDailyDoggo(telegramBot).run()
+    telegramBot.run()
+  }
+
+  new Thread {
+    new ZulipHourlyDoggo(zulipBot).run()
+    zulipBot.start()
   }.start()
 
   new Thread {
-    override def run(): Unit = createConnection
-  }.start()
+    createConnection
+  }
 
   new Thread {
-    val dailyDoggo = new DailyDoggo(bot)
-    override def run(): Unit = dailyDoggo.run()
+    new RocketHourlyDoggo(rocketBot).run()
   }.start()
 
 }

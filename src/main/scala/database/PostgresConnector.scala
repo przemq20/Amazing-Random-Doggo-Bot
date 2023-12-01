@@ -1,27 +1,24 @@
 package database
 
 import cats.effect.IO
-import com.typesafe.config.{ Config, ConfigFactory }
+import database.PostgresConnector.{PASSWORD, URL, USERNAME}
 import database.tables.PersonTable
 import doobie.Transactor
+import utils.Environment
 
-object PostgresConnector {
-
-  private val config: Config = ConfigFactory.load().getConfig("RandomDoggo.PostgreSQL.credentials")
-
-  private val url: String = config
-    .getString("URL")
-  private val user: String = config
-    .getString("user")
-  private val pass: String = config
-    .getString("pass")
+class PostgresConnector {
 
   private val xa = Transactor.fromDriverManager[IO](
-    "org.postgresql.Driver", // driver classname
-    url,                     // connect URL (driver-specific)
-    user,                    // user
-    pass                     // password
+    "org.postgresql.Driver",
+    URL,
+    USERNAME,
+    PASSWORD
   )
 
   val personTable = new PersonTable(xa)
+}
+object PostgresConnector extends Environment("PostgresSql") {
+  final lazy val URL:      String = config.getVariableString("URL")
+  final lazy val USERNAME: String = config.getVariableString("user")
+  final lazy val PASSWORD: String = config.getVariableString("pass")
 }

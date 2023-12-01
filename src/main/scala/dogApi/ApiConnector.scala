@@ -2,6 +2,7 @@ package dogApi
 
 import scalaj.http.{ Http, HttpResponse }
 
+import java.io.{ BufferedOutputStream, File, FileOutputStream }
 import scala.annotation.tailrec
 import scala.util.Random
 
@@ -19,7 +20,7 @@ class ApiConnector {
 
   private val random = new Random()
 
-  private def getPhotoUrl: String = {
+  def getPhotoUrl: String = {
     apis(math.abs(random.nextInt()) % apis.length).getPhotoUrl
   }
 
@@ -28,10 +29,18 @@ class ApiConnector {
   }
 
   @tailrec
-  final def downloadPhoto(maxSize: Long): Array[Byte] = {
+  final def downloadPhoto(maxSize: Long = 1 * 1024 * 1024): Array[Byte] = {
     val photo = getResponse.body
     if (photo.length < maxSize) photo
     else downloadPhoto(maxSize)
+  }
+
+  def saveToFile(): File = {
+    val file   = new File("temp.jpg")
+    val target = new BufferedOutputStream(new FileOutputStream(file))
+    downloadPhoto().foreach(target.write(_))
+    target.close()
+    file
   }
 
 }
