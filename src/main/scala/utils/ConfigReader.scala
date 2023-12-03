@@ -1,7 +1,8 @@
 package utils
 
-import com.typesafe.config.{ Config, ConfigFactory }
-
+import com.typesafe.config.Config
+import com.typesafe.config.ConfigFactory
+import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
 class ConfigReader(configPath: String) {
@@ -21,8 +22,6 @@ class ConfigReader(configPath: String) {
   def getVariableInt(variable: String): Int = getVariableString(variable).toInt
 
   def getVariableList(variable: String): List[String] = {
-    import scala.jdk.CollectionConverters._
-//    import collection.JavaConverters._
     config.getStringList(variable).asScala.toList
   }
 }

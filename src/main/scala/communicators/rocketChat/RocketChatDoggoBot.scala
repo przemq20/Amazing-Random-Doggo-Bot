@@ -1,8 +1,13 @@
 package communicators.rocketChat
 
+import RocketChatDoggoBot.ROOM_ID
+import RocketChatDoggoBot.SEND_MESSAGE_URL
+import RocketChatDoggoBot.SEND_PHOTO_URL
+import RocketChatDoggoBot.TOKEN
+import RocketChatDoggoBot.USER_ID
 import dogApi.ApiConnector
-import RocketChatDoggoBot.{ ROOM_ID, SEND_MESSAGE_URL, SEND_PHOTO_URL, TOKEN, USER_ID }
-import scalaj.http.{ Http, HttpOptions }
+import scalaj.http.Http
+import scalaj.http.HttpOptions
 import utils.Environment
 
 class RocketChatDoggoBot {
@@ -50,18 +55,18 @@ class RocketChatDoggoBot {
   private def makeMessageString(content: String): String = {
     val newlineChar    = "\\n"
     val whitespaceChar = "\u2001"
-    val rawContent = content
+    val rawContent     = content
       .replace("\n", newlineChar)
       .replace("\t", whitespaceChar * 3)
       .replace("\"", "")
       .replace("{", "")
       .replace("}", "")
 
-    s"""{"message": {"rid": "${ROOM_ID}", "msg": "$rawContent "}}"""
+    s"""{"message": {"rid": "$ROOM_ID", "msg": "$rawContent "}}"""
   }
 
   private def makePhotoString(photoUrl: String): String = {
-    s"""{"roomId": "$ROOM_ID", "text": "Pjesek!", "attachments": [{"image_url": "$photoUrl"}] }"""
+    s"""{"roomId": "$ROOM_ID", "text": "Pjesek!", "attachments": [{"image_url": "$photoUrl", "thumb_url": "$photoUrl"}] }"""
   }
 }
 

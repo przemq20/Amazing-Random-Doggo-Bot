@@ -1,10 +1,12 @@
 package dogApi
 
-import dogApi.TheDogApi.{ TOKEN, URL }
+import dogApi.TheDogApi.TOKEN
+import dogApi.TheDogApi.URL
 import scalaj.http.Http
 import spray.json.DefaultJsonProtocol.StringJsonFormat
 import spray.json._
-import utils.{ConfigType, Environment}
+import utils.ConfigType
+import utils.Environment
 
 class TheDogApi extends PhotoApi {
 

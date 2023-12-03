@@ -1,8 +1,8 @@
 package utils.scheduler
 
-import akka.actor.{ ActorRef, ActorSystem }
+import akka.actor.ActorRef
+import akka.actor.ActorSystem
 import com.typesafe.akka.extension.quartz.QuartzSchedulerExtension
-
 import java.time.LocalDateTime
 
 object Scheduler {

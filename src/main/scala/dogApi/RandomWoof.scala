@@ -1,15 +1,16 @@
 package dogApi
 
+import dogApi.RandomWoof.URL
 import scalaj.http.Http
 import spray.json.DefaultJsonProtocol.StringJsonFormat
 import spray.json._
-import utils.{ConfigType, Environment}
+import utils.ConfigType
+import utils.Environment
 
 class RandomWoof extends PhotoApi {
-  private val url = "https://random.dog/woof.json"
 
   override def getPhotoUrl: String = {
-    val request = Http(url)
+    val request = Http(URL)
       .header("Content-type", "application/json")
       .header("Charset", "UTF-8")
 
@@ -26,6 +27,6 @@ class RandomWoof extends PhotoApi {
   }
 }
 
-object RandomWoof extends Environment("RandomWoof", ConfigType.ENVIRONMENT){
+object RandomWoof extends Environment("RandomWoof", ConfigType.ENVIRONMENT) {
   private lazy val URL = config.getVariableString("url")
 }

@@ -1,10 +1,12 @@
 package dogApi
 
-import scalaj.http.{ Http, HttpResponse }
-
-import java.io.{ BufferedOutputStream, File, FileOutputStream }
+import java.io.BufferedOutputStream
+import java.io.File
+import java.io.FileOutputStream
 import scala.annotation.tailrec
 import scala.util.Random
+import scalaj.http.Http
+import scalaj.http.HttpResponse
 
 class ApiConnector {
 
@@ -20,8 +22,11 @@ class ApiConnector {
 
   private val random = new Random()
 
-  def getPhotoUrl: String = {
-    apis(math.abs(random.nextInt()) % apis.length).getPhotoUrl
+  @tailrec
+  final def getPhotoUrl: String = {
+    val url = apis(math.abs(random.nextInt()) % apis.length).getPhotoUrl
+    if (url.toLowerCase.endsWith(".jpg") || url.toLowerCase.endsWith(".png")) url
+    else getPhotoUrl
   }
 
   private def getResponse: HttpResponse[Array[Byte]] = {

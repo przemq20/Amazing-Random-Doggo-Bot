@@ -1,19 +1,23 @@
 package communicators.telegram
 
+import TelegramDoggoBot.ADMIN_ROOM
+import TelegramDoggoBot.TOKEN
 import akka.actor.ActorSystem
+import com.bot4s.telegram.api.ChatActions
+import com.bot4s.telegram.api.RequestHandler
 import com.bot4s.telegram.api.declarative.Commands
-import com.bot4s.telegram.api.{ChatActions, RequestHandler}
 import com.bot4s.telegram.clients.AkkaHttpClient
-import com.bot4s.telegram.future.{Polling, TelegramBot}
-import com.bot4s.telegram.methods.{SendMessage, SendPhoto}
-import com.bot4s.telegram.models.{InputFile, Message}
+import com.bot4s.telegram.future.Polling
+import com.bot4s.telegram.future.TelegramBot
+import com.bot4s.telegram.methods.SendMessage
+import com.bot4s.telegram.methods.SendPhoto
+import com.bot4s.telegram.models.InputFile
+import com.bot4s.telegram.models.Message
 import database.PostgresConnector
 import dogApi.ApiConnector
-import TelegramDoggoBot.{ADMIN_ROOM, TOKEN}
-import utils.Environment
-
 import scala.concurrent.Future
 import scala.language.postfixOps
+import utils.Environment
 
 class TelegramDoggoBot extends TelegramBot with Polling with Commands[Future] with ChatActions[Future] {
 
@@ -28,22 +32,22 @@ class TelegramDoggoBot extends TelegramBot with Polling with Commands[Future] wi
     val chat = msg.chat
     for {
       _ <- Future {
-            uploadingPhoto
-            sendPhoto(msg.source)
-          }
+             uploadingPhoto
+             sendPhoto(msg.source)
+           }
       _ <- Future {
-            val firstName = msg.chat.firstName.getOrElse("")
-            val lastName  = msg.chat.lastName.getOrElse("")
-            scribe.info(s"Updating counter for $firstName $lastName")
-            if (chat.id != adminChat)
-              sendMessage(
-                adminChat,
-                s"$firstName $lastName downloaded a photo",
-                disableNotification = Some(true)
-              )
-            pc.personTable
-              .insert(chat.id, firstName, lastName, chat.username.getOrElse(""))
-          }
+             val firstName = msg.chat.firstName.getOrElse("")
+             val lastName  = msg.chat.lastName.getOrElse("")
+             scribe.info(s"Updating counter for $firstName $lastName")
+             if (chat.id != adminChat)
+               sendMessage(
+                 adminChat,
+                 s"$firstName $lastName downloaded a photo",
+                 disableNotification = Some(true)
+               )
+             pc.personTable
+               .insert(chat.id, firstName, lastName, chat.username.getOrElse(""))
+           }
     } yield ()
 
   }
@@ -75,6 +79,6 @@ class TelegramDoggoBot extends TelegramBot with Polling with Commands[Future] wi
 }
 
 object TelegramDoggoBot extends Environment("Telegram") {
-  final val TOKEN: String = config.getVariableString("token")
-  final val ADMIN_ROOM: Int = config.getVariableInt("admin_room")
+  final val TOKEN:      String = config.getVariableString("token")
+  final val ADMIN_ROOM: Int    = config.getVariableInt("admin_room")
 }

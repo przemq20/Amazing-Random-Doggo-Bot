@@ -1,7 +1,9 @@
 package database
 
 import cats.effect.IO
-import database.PostgresConnector.{PASSWORD, URL, USERNAME}
+import database.PostgresConnector.PASSWORD
+import database.PostgresConnector.URL
+import database.PostgresConnector.USERNAME
 import database.tables.PersonTable
 import doobie.Transactor
 import utils.Environment

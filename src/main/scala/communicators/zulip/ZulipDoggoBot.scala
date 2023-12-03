@@ -1,13 +1,13 @@
 package communicators.zulip
 
+import ZulipDoggoBot.ROOM_ID
 import com.github.jamesnetherton.zulip.client.Zulip
-import com.github.jamesnetherton.zulip.client.api.event.{ EventPoller, MessageEventListener }
+import com.github.jamesnetherton.zulip.client.api.event.EventPoller
+import com.github.jamesnetherton.zulip.client.api.event.MessageEventListener
 import com.github.jamesnetherton.zulip.client.api.message.Message
 import dogApi.ApiConnector
-import utils.Environment
-import ZulipDoggoBot.ROOM_ID
-
 import java.lang
+import utils.Environment
 
 class ZulipDoggoBot(zulip: Zulip) {
   val api = new ApiConnector
@@ -49,7 +49,7 @@ object ZulipDoggoBot extends Environment("Zulip") {
   final lazy val TOKEN:   String = config.getVariableString("token")
   final lazy val USER_ID: String = config.getVariableString("user_id")
 
-  val zulip: Zulip = new Zulip(USER_ID, TOKEN, HOST)
+  val zulip:   Zulip         = new Zulip(USER_ID, TOKEN, HOST)
   def apply(): ZulipDoggoBot = {
     new ZulipDoggoBot(zulip)
   }
