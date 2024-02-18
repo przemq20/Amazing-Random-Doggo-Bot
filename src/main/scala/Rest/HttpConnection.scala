@@ -52,7 +52,7 @@ object HttpConnection {
               )
             } else {
               val rocketBot = maybeRocket.head
-              rocketBot.asInstanceOf[RocketChatDoggoBot].uploadPhoto()
+//              rocketBot.asInstanceOf[RocketChatDoggoBot].uploadPhoto()
               complete(
                 StatusCodes.Found
               )
