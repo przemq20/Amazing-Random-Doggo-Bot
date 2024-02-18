@@ -9,6 +9,7 @@ import utils.ConfigType
 import utils.Environment
 
 class TheDogApi extends PhotoApi {
+  override def toString: String = "TheDogApi"
 
   override def getPhotoUrl: String = {
 

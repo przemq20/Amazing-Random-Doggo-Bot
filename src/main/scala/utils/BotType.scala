@@ -9,7 +9,7 @@ object BotType {
   def fromString(str: String): BotType = {
     str match {
       case "Zulip"      => ZULIP
-      case "RocketChat" => ROCKETCHAT
+      case "Rocket" => ROCKETCHAT
       case "Telegram"   => TELEGRAM
       case _            => throw new Exception("")
     }

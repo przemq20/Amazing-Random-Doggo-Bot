@@ -7,6 +7,7 @@ import scala.annotation.tailrec
 import scala.util.Random
 import scalaj.http.Http
 import scalaj.http.HttpResponse
+import utils.FileData
 
 class ApiConnector {
 
@@ -23,29 +24,39 @@ class ApiConnector {
   private val random = new Random()
 
   @tailrec
-  final def getPhotoUrl: String = {
-    val url = apis(math.abs(random.nextInt()) % apis.length).getPhotoUrl
-    if (url.toLowerCase.endsWith(".jpg") || url.toLowerCase.endsWith(".png")) url
+  final def getPhotoUrl: FileData = {
+    val rand = random.nextInt(apis.length)
+    val api  = apis(math.abs(rand) % apis.length)
+    val url  = api.getPhotoUrl
+    if (url.toLowerCase.endsWith(".jpg") || url.toLowerCase.endsWith(".png")) FileData(None, None, url, api)
     else getPhotoUrl
   }
 
-  private def getResponse: HttpResponse[Array[Byte]] = {
-    Http(getPhotoUrl).asBytes
+  private def getResponse: FileData = {
+    val url = getPhotoUrl
+    FileData(
+      None,
+      Some(Http(getPhotoUrl.url).asBytes.body),
+      url.url,
+      getPhotoUrl.api
+    )
   }
 
   @tailrec
-  final def downloadPhoto(maxSize: Long = 1 * 1024 * 1024): Array[Byte] = {
-    val photo = getResponse.body
-    if (photo.length < maxSize) photo
+  final def downloadPhoto(maxSize: Long = 1 * 1024 * 1024): FileData = {
+    val response = getResponse
+    val photo    = response.bytes
+    if (photo.map(_.length).getOrElse(Int.MaxValue) < maxSize) FileData(None, photo, response.url, response.api)
     else downloadPhoto(maxSize)
   }
 
-  def saveToFile(): File = {
-    val file   = new File("temp.jpg")
-    val target = new BufferedOutputStream(new FileOutputStream(file))
-    downloadPhoto().foreach(target.write(_))
+  def saveToFile(): FileData = {
+    val file            = new File("temp.jpg")
+    val target          = new BufferedOutputStream(new FileOutputStream(file))
+    val downloadedPhoto = downloadPhoto()
+    downloadedPhoto.bytes.foreach(target.write)
     target.close()
-    file
+    FileData(Some(file), downloadedPhoto.bytes, downloadedPhoto.url, downloadedPhoto.api)
   }
 
 }

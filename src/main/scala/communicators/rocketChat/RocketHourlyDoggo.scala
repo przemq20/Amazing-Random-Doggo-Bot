@@ -43,7 +43,7 @@ class RocketHourlyDoggo(rocketBot: RocketChatDoggoBot) {
   }
 
   private def sendDailyDoggo(): Flow[Tick, Tick, NotUsed] = Flow[Tick].map { tick =>
-    rocketBot.sendPhoto()
+    rocketBot.uploadPhoto()
     tick
   }
 

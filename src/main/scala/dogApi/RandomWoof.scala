@@ -8,6 +8,7 @@ import utils.ConfigType
 import utils.Environment
 
 class RandomWoof extends PhotoApi {
+  override def toString: String = "RandomWoof"
 
   override def getPhotoUrl: String = {
     val request = Http(URL)

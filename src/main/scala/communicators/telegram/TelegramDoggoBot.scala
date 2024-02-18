@@ -17,9 +17,10 @@ import database.PostgresConnector
 import dogApi.ApiConnector
 import scala.concurrent.Future
 import scala.language.postfixOps
+import utils.Bot
 import utils.Environment
 
-class TelegramDoggoBot extends TelegramBot with Polling with Commands[Future] with ChatActions[Future] {
+class TelegramDoggoBot extends TelegramBot with Polling with Commands[Future] with ChatActions[Future] with Bot {
 
   implicit val actorSystem: ActorSystem            = ActorSystem()
   override val client:      RequestHandler[Future] = new AkkaHttpClient(TOKEN)
@@ -69,13 +70,39 @@ class TelegramDoggoBot extends TelegramBot with Polling with Commands[Future] wi
   }
 
   def sendPhoto(chatId: Long, caption: Option[String] = None): Future[Message] = {
-    val bytes = api.downloadPhoto(1 * 1024 * 1024)
+    val bytes = api.downloadPhoto(1 * 1024 * 1024).bytes.getOrElse(Array[Byte]())
     val photo = InputFile("pjesek.png", bytes)
-    request(SendPhoto(chatId, photo, caption))
+    try {
+      request(SendPhoto(chatId, photo, caption))
+    } catch {
+      case e: Throwable =>
+        scribe.error(e.getLocalizedMessage)
+        e.printStackTrace()
+        Future.failed(e)
+    }
   }
 
-  def sendMessage(chatId: Long, message: String, disableNotification: Option[Boolean] = None): Future[Message] =
-    request(SendMessage(chatId, message, disableNotification = disableNotification))
+  def sendMessage(chatId: Long, message: String, disableNotification: Option[Boolean] = None): Future[Message] = {
+    try {
+      request(SendMessage(chatId, message, disableNotification = disableNotification))
+    } catch {
+      case e: Throwable =>
+        scribe.error(e.getLocalizedMessage)
+        e.printStackTrace()
+        Future.failed(e)
+    }
+  }
+
+  override def runCron(): Unit = {
+    val cron = new TelegramDailyDoggo(this)
+    cron.run()
+  }
+
+  override def run(): Future[Unit] = {
+    Future(runCron())
+    super.run()
+  }
+
 }
 
 object TelegramDoggoBot extends Environment("Telegram") {

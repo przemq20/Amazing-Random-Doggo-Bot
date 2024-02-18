@@ -22,6 +22,7 @@ class ConfigReader(configPath: String) {
   def getVariableInt(variable: String): Int = getVariableString(variable).toInt
 
   def getVariableList(variable: String): List[String] = {
-    config.getStringList(variable).asScala.toList
+    Properties.envOrElse(variable, config.getString(variable)).split(";").toList
+//      config.getStringList(variable).asScala.toList
   }
 }

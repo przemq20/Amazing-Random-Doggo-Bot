@@ -1,10 +1,9 @@
 import Rest.HttpConnection.createConnection
 import communicators.rocketChat.RocketChatDoggoBot
-import communicators.rocketChat.RocketHourlyDoggo
-import communicators.telegram.TelegramDailyDoggo
 import communicators.telegram.TelegramDoggoBot
 import communicators.zulip.ZulipDoggoBot
-import communicators.zulip.ZulipHourlyDoggo
+import scala.annotation.tailrec
+import utils.Bot
 import utils.BotType
 import utils.ConfigReader
 
@@ -12,25 +11,31 @@ object Main extends App {
   val config = new ConfigReader("RandomDoggo")
   private val botsToRun: List[BotType] = config.getVariableList("Bots").map(BotType.fromString)
 
-  new Thread {
-    createConnection
-  }.start()
+  val startedBots = startBots(botsToRun)
+  println(startedBots)
 
-  for (bot <- botsToRun) {
-    new Thread {
-      bot match {
-        case BotType.ZULIP      =>
-          val zulipBot = ZulipDoggoBot()
-          new ZulipHourlyDoggo(zulipBot).run()
-          zulipBot.start()
-        case BotType.TELEGRAM   =>
-          val telegramBot = new TelegramDoggoBot
-          new TelegramDailyDoggo(telegramBot).run()
-          telegramBot.run()
-        case BotType.ROCKETCHAT =>
-          val rocketBot = new RocketChatDoggoBot
-          new RocketHourlyDoggo(rocketBot).run()
-      }
-    }.start()
+  createConnection(startedBots)
+
+  @tailrec
+  private def startBots(botsToRun: List[BotType], runningBots: List[Bot] = List.empty): List[Bot] = {
+    botsToRun match {
+      case _ if botsToRun.isEmpty => runningBots
+      case _                      =>
+        val bot = botsToRun.head
+        bot match {
+          case BotType.ZULIP      =>
+            val zulipBot = ZulipDoggoBot()
+            zulipBot.run()
+            startBots(botsToRun.drop(1), runningBots ::: zulipBot.asInstanceOf[Bot] :: Nil)
+          case BotType.TELEGRAM   =>
+            val telegramBot = new TelegramDoggoBot
+            telegramBot.run()
+            startBots(botsToRun.drop(1), runningBots ::: telegramBot.asInstanceOf[Bot] :: Nil)
+          case BotType.ROCKETCHAT =>
+            val rocketBot = new RocketChatDoggoBot
+            rocketBot.run()
+            startBots(botsToRun.drop(1), runningBots ::: rocketBot.asInstanceOf[Bot] :: Nil)
+        }
+    }
   }
 }

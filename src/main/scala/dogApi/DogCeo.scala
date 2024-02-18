@@ -13,6 +13,7 @@ import utils.Environment
 class DogCeo extends PhotoApi {
   private val random: Random = new Random()
 
+  override def toString: String = "DogCeo"
   override def getPhotoUrl: String = {
     val randomBreed: String = BREEDS(random.nextInt(BREEDS.size))
     val fullUrl = s"$URL$randomBreed$ENDPOINT"
